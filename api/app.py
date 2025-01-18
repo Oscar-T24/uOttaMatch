@@ -4,7 +4,12 @@ from dataclasses import dataclass, fields,asdict
 from flask import Flask, request, jsonify,send_from_directory,abort
 import os
 from werkzeug.utils import secure_filename
+from flask_cors import CORS  # Import flask_cors
+
+
 app = Flask(__name__)
+
+CORS(app, origins="http://localhost:5173")
 STATIC_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'client')
 # Initialize Firebase
 
