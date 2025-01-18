@@ -1,6 +1,6 @@
 from flask import Flask, request
 from profile import UserProfile
-
+from dataclasses import dataclass, fields,asdict
 from flask import Flask, request, jsonify
 
 app = Flask(__name__)
@@ -25,8 +25,9 @@ def add_user():  # put application's code here
 
             # Initialize dataclass
             user_data = UserProfile(**filtered_data)
+            user_data.save_to_firebase()
         except TypeError as e:
-            print("error when initializing the class : incomplete informations ",e)
+            print("Error when initializing user : did you make sure that you included all attributes in the body of the request ? ",e)
 
         return "received your request"
     if request.method == 'GET':
@@ -36,6 +37,11 @@ def add_user():  # put application's code here
 @app.route('/remove_user', methods=['POST'])
 def remove_user():
     return "method not implemented yet"
+
+@app.route('/get_all', methods=['GET'])
+def get_all():
+    #print("getting all users",UserProfile.get_all_users())
+    return UserProfile.get_all_users()
 
 if __name__ == '__main__':
     app.run()
