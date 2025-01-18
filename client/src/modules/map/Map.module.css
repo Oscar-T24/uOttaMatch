@@ -1,0 +1,16 @@
+.mapWrapper {
+  position: relative;
+  width: 100%;
+  height: 500px;
+  top: 100px;
+  animation: fadeInAnimation 1s ease-in;
+}
+
+@keyframes fadeInAnimation {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
