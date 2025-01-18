@@ -5,6 +5,7 @@ import Main from "./components/main/Main";
 import Auth from "./components/auth/auth";
 import Map from "./components/maps/Map";
 import Hackathon from "./components/hackathons/Hackathon";
+import Profile from "./components/profile/Profile";
 
 const Routes = () => {
   const element = useRoutes([
@@ -25,6 +26,10 @@ const Routes = () => {
           path: "/hackathons/:id",
           element: <Hackathon />,
         },
+        {
+          path: "/profile",
+          element: <Profile />,
+        }
       ],
     },
   ]);

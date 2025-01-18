@@ -1,0 +1,135 @@
+.container {
+    font-family: Arial, sans-serif;
+    background-color: #f9f9f9;
+    padding: 20px;
+    min-height: 100vh;
+  }
+  
+  .header {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+  
+  .title {
+    font-size: 24px;
+    color: #444;
+    margin: 0;
+  }
+  
+  .logout {
+    color: #5a5a5a;
+    text-decoration: none;
+    margin-left: 10px;
+    font-size: 16px;
+  }
+  
+  .logout:hover {
+    text-decoration: underline;
+  }
+  
+  .formContainer {
+    max-width: 450px;
+    margin: 0 auto;
+    padding: 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .heading {
+    text-align: center;
+    font-size: 28px;
+    color: #333;
+    margin-bottom: 20px;
+  }
+  
+  .form {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .formGroup {
+    margin-bottom: 20px;
+  }
+  
+  label {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 8px;
+    display: block;
+    color: #555;
+  }
+  
+  input,
+  select,
+  button {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+  }
+  
+  input:focus,
+  select:focus,
+  button:focus {
+    outline: none;
+    border-color: #888;
+  }
+  
+  .skillInputContainer {
+    display: flex;
+  }
+  
+  .addSkillBtn {
+    background-color: #666;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    margin-left: 10px;
+    cursor: pointer;
+  }
+  
+  .addSkillBtn:hover {
+    background-color: #444;
+  }
+  
+  .skillTags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  
+  .tag {
+    background-color: #888;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 14px;
+  }
+  
+  .removeTag {
+    margin-left: 8px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  
+  .removeTag:hover {
+    color: #d33;
+  }
+  
+  .submitBtn {
+    background-color: #333;
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  
+  .submitBtn:hover {
+    background-color: #555;
+  }
