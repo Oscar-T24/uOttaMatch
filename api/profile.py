@@ -62,4 +62,3 @@ class UserProfile:
 
 @dataclass
 class TeamMatching(UserProfile):
-    
