@@ -91,7 +91,8 @@
 
 .buttonWrapper button {
   padding: 12px 24px;
-  background: black;
+  background: repeating-linear-gradient(60deg, black 20%, transparent 40%),
+    linear-gradient(to right, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.6));
   color: #ffffff;
   border: none;
   border-radius: 12px;

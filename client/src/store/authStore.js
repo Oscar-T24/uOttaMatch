@@ -5,6 +5,7 @@ import {
   signInWithPopup,
   GoogleAuthProvider,
   GithubAuthProvider,
+  signInWithEmailAndPassword,
 } from "firebase/auth";
 import { auth } from "../api/firebaseConfig";
 
@@ -12,6 +13,7 @@ const authStore = create((set) => ({
   user: null,
   loading: false,
   error: null,
+  showRegister: true,
 
   actions: {
     setUser: (user) => {
@@ -30,11 +32,34 @@ const authStore = create((set) => ({
       set(() => ({ error: null }));
     },
 
+    setShowRegister: (registerState) => {
+      set((state) => ({ ...state, showRegister: registerState }));
+    },
+
     authWithFirebase: async (formData) => {
       set(() => ({ loading: true }));
       try {
         const { email, password } = formData;
         const userCredentials = await createUserWithEmailAndPassword(
+          auth,
+          email,
+          password
+        );
+        set((state) => ({
+          ...state,
+          user: userCredentials.user,
+          loading: false,
+        }));
+      } catch (error) {
+        set(() => ({ error: error.message, loading: false }));
+      }
+    },
+
+    signInWithFirebase: async (formData) => {
+      set(() => ({ loading: true }));
+      try {
+        const { email, password } = formData;
+        const userCredentials = await signInWithEmailAndPassword(
           auth,
           email,
           password

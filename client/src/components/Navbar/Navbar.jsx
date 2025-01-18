@@ -3,27 +3,18 @@ import { FaSearch } from "react-icons/fa";
 import styles from "../../modules/Navbar/Navbar.module.css";
 import { Link } from "react-router-dom";
 import authStore from "../../store/authStore";
-
-const hackathons = [
-  { id: 1, name: "Hackathon 2025" },
-  { id: 2, name: "uOttaHack" },
-  { id: 3, name: "TechCrunch Hackathon" },
-  { id: 4, name: "MLH Global Hackathon" },
-  { id: 5, name: "Code for Good Hackathon" },
-  { id: 6, name: "HackMIT" },
-  { id: 7, name: "DevPost Hackathon" },
-  { id: 8, name: "NASA Space Apps Challenge" },
-  { id: 9, name: "Facebook Hackathon" },
-  { id: 10, name: "Google AI Hackathon" },
-  { id: 11, name: "HackTheNorth" },
-  { id: 12, name: "GitHub Universe Hackathon" },
-];
+import hackathonStore from "../../store/hackathonStore";
 
 const Navbar = () => {
+  const hackStore = hackathonStore((state) => state);
+  const { hackathons } = hackStore;
+
+  console.log(hackathons);
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredHackathons, setFilteredHackathons] = useState([]);
 
   const authState = authStore((state) => state);
+  const { setShowRegister } = authState;
   const { logoutWithFirebase } = authState.actions;
 
   const handleSearchChange = (event) => {
@@ -41,6 +32,15 @@ const Navbar = () => {
   };
 
   const displayedHackathons = filteredHackathons.slice(0, 10);
+
+  const handleOnClickLogout = () => {
+    logoutWithFirebase();
+    setShowRegister(true);
+  };
+
+  const onHackathonClick = () => {
+    setFilteredHackathons([]);
+  };
 
   return (
     <div className={styles.navWrapper}>
@@ -60,7 +60,7 @@ const Navbar = () => {
           </div>
         </div>
         <div className={styles.buttonWrapper}>
-          <button onClick={logoutWithFirebase}>Logout</button>
+          <button onClick={() => handleOnClickLogout()}>Logout</button>
         </div>
       </nav>
 
@@ -68,7 +68,12 @@ const Navbar = () => {
         <ul className={styles.resultsList}>
           {displayedHackathons.map((hackathon) => (
             <li key={hackathon.id}>
-              <Link to={`/hackathons/${hackathon.id}`}>{hackathon.name}</Link>
+              <Link
+                onClick={onHackathonClick}
+                to={`/hackathons/${hackathon.id}`}
+              >
+                {hackathon.name}
+              </Link>
             </li>
           ))}
         </ul>

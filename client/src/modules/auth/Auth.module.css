@@ -108,6 +108,7 @@
 
 .googleButton,
 .githubButton {
+  width: 100%;
   padding: 0.75rem 1rem;
   font-size: 0.875rem;
   color: #ffffff;
@@ -133,4 +134,12 @@
 
 .githubButton:hover {
   background-color: #444;
+}
+
+.link {
+  text-align: center;
+}
+
+.link span a {
+  color: black;
 }
