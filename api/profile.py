@@ -59,3 +59,7 @@ class UserProfile:
         except Exception as e:
             return {"error": str(e)}
 #the @datclass decorator makes a custom __init__ method that allows to define every argument
+
+@dataclass
+class TeamMatching(UserProfile):
+    
