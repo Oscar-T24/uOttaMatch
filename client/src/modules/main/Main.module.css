@@ -1,0 +1,63 @@
+.screenContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  background-color: #f1f5f8;
+}
+
+.screen {
+  border: 20px solid black;
+  width: 1000px;
+  height: 600px;
+  border-radius: 2rem;
+  box-shadow: 0 20px 30px rgba(0, 0, 0, 0.2), 0 10px 15px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(135deg, #e6e9eb, #e3e5ea);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+  animation: bounceAnimation 2s ease-out;
+}
+
+.screen h1 {
+  font-size: 70px;
+  color: #333;
+}
+
+.arrowDown {
+  margin-top: 50px;
+  animation: pullEffect 2s ease-in-out infinite;
+  box-shadow: 0px 2px 0px black;
+}
+
+@keyframes pullEffect {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(10px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes bounceAnimation {
+  0% {
+    transform: translateY(1000px);
+  }
+  50% {
+    transform: translateY(-30px);
+  }
+  70% {
+    transform: translateY(10px);
+  }
+  90% {
+    transform: translateY(-5px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
