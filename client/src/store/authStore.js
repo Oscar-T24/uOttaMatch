@@ -1,5 +1,11 @@
 import { create } from "zustand";
-import { createUserWithEmailAndPassword, signOut } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  signOut,
+  signInWithPopup,
+  GoogleAuthProvider,
+  GithubAuthProvider,
+} from "firebase/auth";
 import { auth } from "../api/firebaseConfig";
 
 const authStore = create((set) => ({
@@ -48,6 +54,36 @@ const authStore = create((set) => ({
       try {
         await signOut(auth);
         set(() => ({ user: null, loading: false }));
+      } catch (error) {
+        set(() => ({ error: error.message, loading: false }));
+      }
+    },
+
+    handleGoogleLogin: async () => {
+      set(() => ({ loading: true }));
+      try {
+        const provider = new GoogleAuthProvider();
+        const userCredentials = await signInWithPopup(auth, provider);
+        set((state) => ({
+          ...state,
+          user: userCredentials.user,
+          loading: false,
+        }));
+      } catch (error) {
+        set(() => ({ error: error.message, loading: false }));
+      }
+    },
+
+    handleGithubLogin: async () => {
+      set(() => ({ loading: true }));
+      try {
+        const provider = new GithubAuthProvider();
+        const userCredentials = await signInWithPopup(auth, provider);
+        set((state) => ({
+          ...state,
+          user: userCredentials.user,
+          loading: false,
+        }));
       } catch (error) {
         set(() => ({ error: error.message, loading: false }));
       }

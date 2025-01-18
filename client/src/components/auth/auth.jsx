@@ -5,6 +5,7 @@ import {
   GoogleAuthProvider,
   GithubAuthProvider,
   onAuthStateChanged,
+  signInWithPopup,
 } from "firebase/auth";
 import styles from "../../modules/auth/Auth.module.css";
 import authStore from "../../store/authStore";
@@ -13,7 +14,14 @@ import Loader from "../loader/Loader";
 const Auth = ({ children }) => {
   const authState = authStore((state) => state);
   const { user, loading, error } = authState;
-  const { setUser, authWithFirebase, setError, clearError } = authState.actions;
+  const {
+    setUser,
+    authWithFirebase,
+    setError,
+    clearError,
+    handleGoogleLogin,
+    handleGithubLogin,
+  } = authState.actions;
 
   const {
     register,
@@ -25,22 +33,6 @@ const Auth = ({ children }) => {
   const onSubmit = async (data) => {
     await authWithFirebase(data);
     reset();
-  };
-
-  const handleGoogleLogin = () => {
-    const provider = new GoogleAuthProvider();
-    auth
-      .signInWithPopup(provider)
-      .then((result) => setUser(result.user))
-      .catch((error) => setError(error.message));
-  };
-
-  const handleGithubLogin = () => {
-    const provider = new GithubAuthProvider();
-    auth
-      .signInWithPopup(provider)
-      .then((result) => setUser(result.user))
-      .catch((error) => setError(error.message));
   };
 
   useEffect(() => {
@@ -133,13 +125,6 @@ const Auth = ({ children }) => {
               onClick={handleGoogleLogin}
             >
               Sign in with Google
-            </button>
-            <button
-              type="button"
-              className={styles.githubButton}
-              onClick={handleGithubLogin}
-            >
-              Sign in with GitHub
             </button>
           </div>
         </div>
