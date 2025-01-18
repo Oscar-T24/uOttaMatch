@@ -1,6 +1,9 @@
 from dataclasses import dataclass, fields,asdict
 import firebase_admin
-from firebase_admin import credentials, db
+from firebase import firebase
+from dotenv import load_dotenv
+import os
+
 
 
 @dataclass
@@ -11,28 +14,48 @@ class UserProfile:
     minor : list[str]
     skillsets : list[str] # list of skills (by tag name)
     languages : list[str]
+    university: str
 
-    def __init__(self):
+    def __post_init__(self):
         # connect to mongoDB
-        cred = credentials.Certificate("firebase_service_account.json")
-        firebase_admin.initialize_app(cred, {
-            "databaseURL": "https://your-database-url.firebaseio.com/"  # Replace with your database URL
-        })
+        load_dotenv()
+        self.db = firebase.FirebaseApplication(os.getenv("FIREBASE_URL"), None)
+        self.user_id = None
+    # post init executes after init
 
     def save_to_firebase(self):
-        """
-        Saves the current dataclass instance to Firebase Realtime Database.
+        """ve_to_firebase(self):
         """
         try:
-            # Convert the dataclass instance to a dictionary
-            user_data = asdict(self)
+            user_data = asdict(self)  # save user data in a json like format
+            if self.user_id:
+                # Convert the dataclass instance to a dictionary
+                load_dotenv()
+                result = self.db.put(f'/{os.getenv("FIREBASE_URL")}/{self.user_id}', '', user_data)
+                if result['success']:
+                    return True
+            else:
+                # create a new entry
+                result = self.db.post('/users', user_data)
+                if result['success']:
+                    return True
 
-            # Get a reference to the "users" node in Firebase
-            users_ref = db.reference("users")
 
-            # Push the data to Firebase and return the new user's key
-            new_user_ref = users_ref.push(user_data)
-            return {"message": "User added successfully", "user_id": new_user_ref.key}
+        except Exception as e:
+            print(e)
+
+    @staticmethod
+    def get_all_users():
+        """
+        Retrieves all users from the 'users' directory in Firebase.
+        :return: Dictionary of all users or an error message
+        """
+        try:
+            # Retrieve all data under the 'users' directory
+            load_dotenv()
+            db = firebase.FirebaseApplication(os.getenv("FIREBASE_URL"), None)
+            users = db.get(os.getenv("DIR"), None)
+            return {"users": users}
         except Exception as e:
             return {"error": str(e)}
 #the @datclass decorator makes a custom __init__ method that allows to define every argument
