@@ -3,6 +3,7 @@ import firebase_admin
 from firebase import firebase
 from dotenv import load_dotenv
 import os
+from typing import List, Any
 
 
 
@@ -15,6 +16,7 @@ class UserProfile:
     skillsets : list[str] # list of skills (by tag name)
     languages : list[str]
     university: str
+    bio: str
 
     def __post_init__(self):
         # connect to mongoDB
@@ -58,8 +60,15 @@ class UserProfile:
             return {"users": users}
         except Exception as e:
             return {"error": str(e)}
+
+    @staticmethod
+    def get_attrs(dataclass_type: Any):
+        return [field.name for field in fields(dataclass_type)]
 #the @datclass decorator makes a custom __init__ method that allows to define every argument
 
 @dataclass
 class TeamMatching(UserProfile):
-    pass
+    cluster_id:int
+    # used for ML purposes
+
+

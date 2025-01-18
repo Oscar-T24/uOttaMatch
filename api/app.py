@@ -3,10 +3,10 @@ from werkzeug.utils import secure_filename
 from profile import UserProfile  # Assuming your dataclass and related methods are in the profile.py file
 from dataclasses import fields
 import os
-from flask_cors import CORS
+from flask_cors import CORS, cross_origin
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}})
 
 # ADD CORS so that you don;t have to proxy
 
@@ -59,6 +59,7 @@ def remove_user():
 
 
 # Route for getting all users
+@cross_origin
 @app.route('/get_all', methods=['GET'])
 def get_all():
     # Assuming `get_all_users()` is properly implemented in UserProfile
@@ -80,6 +81,9 @@ def api(route):
     else:
         abort(404)  # Return 404 if the file is not found
 
+@app.route("/user_attributes", methods=["GET"])
+def get_user_attributes():
+    return jsonify(UserProfile.get_attrs(UserProfile)), 200
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
