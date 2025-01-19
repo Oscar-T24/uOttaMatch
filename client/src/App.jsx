@@ -3,9 +3,9 @@ import { useRoutes } from "react-router-dom";
 import CommonLayout from "./components/commonLayout/CommonLayout";
 import Main from "./components/main/Main";
 import Auth from "./components/auth/auth";
-import Map from "./components/map/Map";
 import Hackathon from "./components/hackathons/Hackathon";
 import Profile from "./components/profile/Profile";
+import Dashboard from "./components/dashboard/Dashboard";
 
 const Routes = () => {
   const element = useRoutes([
@@ -18,7 +18,6 @@ const Routes = () => {
           element: (
             <Auth>
               <Main />
-              <Map />
             </Auth>
           ),
         },
@@ -29,6 +28,10 @@ const Routes = () => {
         {
           path: "/profile",
           element: <Profile />,
+        },
+        {
+          path: "/dashboard",
+          element: <Dashboard />,
         },
       ],
     },
