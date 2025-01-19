@@ -5,10 +5,14 @@ from firebase import firebase
 import os
 from pinecone import Pinecone, ServerlessSpec
 from profile import UserProfile
+import pinecone
+from gensim.models import Word2Vec
+from gensim.utils import simple_preprocess
+import numpy as np
 
 
 class Matcher:
-    def __init__(self, k, user_id):
+    def __init__(self, k, user_id,dimension=20):
         """
         Initialize the matcher with dynamic dimensionality based on available features
 
@@ -17,55 +21,57 @@ class Matcher:
         """
         load_dotenv()
         self.k = k
+        self.dimension=dimension
         self.db = firebase.FirebaseApplication(os.getenv("FIREBASE_URL"), None)
         self.users_data = self.db.get('/users', None)
         self.user_id = user_id
         self.clusters = len(self.users_data) // k
 
         # Calculate the total dimension based on feature vectors
-        self.dimension = self._calculate_total_dimension()
 
         pc = Pinecone(api_key=os.getenv("PINECONE_API_KEY"))
 
         # Check if index exists and has correct dimension
         existing_indexes = pc.list_indexes()
-        if 'user-vectors' not in existing_indexes:
-            pc.create_index(
-                name='user-vectors',
-                dimension=self.dimension,
-                spec=ServerlessSpec(cloud='aws', region='us-east-1')
-            )
-        else:
+        try:
+                pc.create_index(
+                    name='user-vectors',
+                    dimension=self.dimension,
+                    spec=ServerlessSpec(cloud='aws', region='us-east-1')
+                )
+        except pinecone.core.openapi.shared.exceptions.PineconeApiException:
+                print("Error creating index : index might already exist")
+
             # Verify dimension of existing index
-            index_info = pc.describe_index('user-vectors')
-            if index_info.dimension != self.dimension:
+        index_info = pc.describe_index('user-vectors')
+        if index_info.dimension != self.dimension:
                 # Handle dimension mismatch
                 print(
                     f"Warning: Index dimension ({index_info.dimension}) does not match required dimension ({self.dimension})")
+
+                print("Deleting the actual index and creating a new one")
+                pc.delete_index("user-vectors")
+                pc.create_index(
+                    name='user-vectors',
+                    dimension=self.dimension,
+                    spec=ServerlessSpec(cloud='aws', region='us-east-1')
+                )
                 # Optionally: Delete and recreate index with new dimension
                 # pc.delete_index('user-vectors')
                 # pc.create_index(...)
 
         self.index = pc.Index('user-vectors')
 
-    def _calculate_total_dimension(self):
+    def _tofill(self):
         """
         Calculate the total dimension needed based on all features
         """
         # Get dimension from languages
         unique_languages = len(self._get_unique_languages())
-        print("UNIQUE ")
 
-        # Add dimensions for other features you might want to include
-        # For example:
-        # skills_dimension = len(self._get_unique_skills())
-        # projects_dimension = len(self._get_unique_projects())
-        # etc.
+        print("UNIQUE LANGUAGES",self._get_unique_languages())
 
-        # Total dimension is sum of all feature dimensions
-        total_dimension = unique_languages  # + skills_dimension + projects_dimension + etc.
-
-        return total_dimension
+        return self.dimension - unique_languages # dimensions to "fill up"
 
     def _get_unique_languages(self):
         """Helper method to get all unique programming languages"""
@@ -81,53 +87,32 @@ class Matcher:
         """
         unique_languages = self._get_unique_languages()
 
-        user_data = self.db.get(f'/users/{self.user_id}', None)
-        if user_data and "languages" in user_data:
-            user_languages = set(user_data["languages"])
-            binary_vector = [1.0 if language in user_languages else 0.0 for language in unique_languages]
-            binary_matrix = np.array(binary_vector)
+        user_data = self.db.get(f'/users/{self.user_id}', None) #get attributes of the user
 
-            # Verify vector dimension matches index dimension
-            if len(binary_matrix) != self.dimension:
-                padding = np.zeros(self.dimension - len(binary_matrix))
-                binary_matrix = np.concatenate([binary_matrix, padding])
+        user_languages = set(user_data["languages"]) #remove duplicates
+        binary_vector = [1.0 if language in user_languages else 0.0 for language in unique_languages]
+        remaining_dims = self._tofill()
+        for _ in range(remaining_dims):
+            binary_vector.extend([0.0])
+        # fill up the remaining dimensions
+        binary_matrix = np.array(binary_vector)
 
-            return unique_languages, binary_matrix
-
-        return None, None
+        return unique_languages, binary_matrix
 
     def match(self):
-        """
-        Compare the current vector with other vectors and return the most similar users based on cosine similarity.
-        """
-        proximity_scores = []
-
-        # Fetch the vector for the current user
-        current_user_vector = self.index.fetch([self.user_id])[self.user_id][
-            'values']  # Assuming 'values' holds the vector
-
-        # Compare the current user's vector with other users' vectors
-        for user in self.users_data:
-            # Fetch the vector for the other user
-            other_user_vector = self.index.fetch([user])[user]['values']  # Assuming 'values' holds the vector
-
-            # Calculate cosine similarity between current and other user's vector
-            score = cosine_similarity([current_user_vector], [other_user_vector])[0][0]
-
-            # Append a tuple of (score, user_id)
-            proximity_scores.append((score, user))
-
-        # Sort by score in descending order (most similar first) and return the top k
-        return sorted(proximity_scores, key=lambda k: k[0], reverse=True)[:self.k]
+        #TODO
+        pass
 
     def add_vector(self):
         # Ensure you vectorize the current user's languages and store them in Pinecone
-        if not self.vectorize_languages():
-            return
+        #if not self.vectorize_languages():
+           # return
         _, user_vector = self.vectorize_languages()
 
         # Upsert the vector
         self.index.upsert([(self.user_id, user_vector)])
+
+        print("Added vector")
 
     def _print_vectors(self):
         try:
@@ -143,8 +128,94 @@ class Matcher:
         except Exception as e:
             print(f"Error fetching vectors: {e}")
 
+    def match(self):
+        """matches people with cosine similarity"""
+
+        for user in UserProfile.get_all_users()["users"]:
+            try:
+                existing_vector = self.index.fetch([self.user_id])
+
+                if self.user_id in existing_vector:
+                    print(f"User {self.user_id} already exists in the database.")
+                    # User is already in the database, no need to add again
+                else:
+                    print("Adding user : ", user)
+                    Matcher(self.k, user).add_vector()
+            except KeyError:
+                # If the user is not found in the index, a KeyError will be raised
+                # or the vector won't exist, so we can proceed to add the user
+                print("Adding user : ", user)
+                Matcher(self.k, user).add_vector()
+
+        proximity_scores = []
+        # since the user doesn't
+
+        current_user_vector = self.index.fetch([self.user_id])['vectors'][self.user_id]['values']
+
+        for user in self.users_data:
+
+            try:
+                other_user_vector = self.index.fetch([user])['vectors'][self.user_id]['values']
+                print("vector got", other_user_vector, "vector of reference", current_user_vector)
+            except:
+                print("Error fetching other user's vector, printing original values",self.index.fetch([user]))
+
+
+
+            score = cosine_similarity([current_user_vector], [other_user_vector])[0][0]
+
+            proximity_scores.append((score, user))
+
+        return sorted(proximity_scores, key=lambda k: k[0], reverse=False)[:self.k]
+
+        # we reverse once because of the range from -1 to 1, but ALSO reverse a second time because the programing languages should be complementary
+
+    def preprocess_text(text):
+        return simple_preprocess(text, deacc=True)  # Tokenize and remove punctuation
+
+    def _get_average_vector(tokens, model, vector_size):
+        valid_tokens = [token for token in tokens if token in model.wv]
+        if not valid_tokens:
+            return np.zeros(vector_size)  # Return a zero vector if no valid tokens
+        # Compute the mean of the word vectors
+        return np.mean([model.wv[token] for token in valid_tokens], axis=0)
+
+    def metadata_embedder(self):
+
+        score = 0
+
+        weights = {
+            "age": 0.5,
+            "university": 0.5,
+            "bio":0.8,
+        }
+        current_user_age = int(self.db.get(f'/users/{self.user_id}', None).get("age", []))
+        current_user_bio = self.db.get(f'/users/{self.user_id}', None).get("bio", [])
+        proximity_scores = {}
+        for user in self.users_data:
+            age_diff = abs(current_user_age - int(self.db.get(f'/users/{user}', None).get("age", [])))
+            proximity_scores[user] += weights['age'] * (1 - min(age_diff / 10, 1))  # Normalize by 10 years
+
+            tokens_bio1,tokens_bio2 = self.preprocess_text(current_user_bio),self.preprocess_text(self.db.get(f'/users/{user}', None).get("bio", []))
+            all_tokens = [tokens_bio1,tokens_bio2]
+
+            model = Word2Vec(sentences=all_tokens, vector_size=100, window=5, min_count=1, workers=4)
+
+            vector_bio1 = self._get_average_vector(tokens_bio1, model, model.vector_size)
+            vector_bio2 = self._get_average_vector(tokens_bio2, model, model.vector_size)
+
+            # Compute the cosine similarity between the two vectors
+            similarity_score = cosine_similarity([vector_bio1], [vector_bio2])[0][0]
+
+            proximity_scores[user] += weights['bio'] * similarity_score
+
+        return sorted(proximity_scores,key=lambda k: k[1], reverse=False)[:self.k]
+
+
+
+
 
 if __name__ == "__main__":
-    for user in UserProfile.get_all_users():
-        Matcher(2, user).add_vector()
+    to_propose = "-OGvh-9y-Rksw6LWMPQZ" #UserProfile.get_all_users()["users"]
+    print(Matcher(2, to_propose).match())
     #match = Matcher(3,username="oscar", age=4, major="", minor="", skillsets="", languages=["python","java"], university="",bio="")

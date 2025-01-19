@@ -13,7 +13,7 @@ class UserProfile:
     age : int
     major : list[str]
     minor : list[str]
-    skillsets : list[str] # list of skills (by tag name)
+    skills : list[str] # list of skills (by tag name)
     languages : list[str]
     university: str
     bio: str
