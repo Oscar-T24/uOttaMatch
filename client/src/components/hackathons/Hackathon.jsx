@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import hackathonStore from "../../store/hackathonStore";
 import styles from "../../modules/hackathons/Hackathon.module.css";
 import Map from "../map/Map";
+import { useNavigate } from "react-router-dom";
 
 const Hackathon = () => {
   const params = useParams();
@@ -14,6 +15,8 @@ const Hackathon = () => {
   const filteredHackathon = hackathons.filter(
     (hackathon) => hackathon.id === parseInt(id)
   );
+
+  const navigate = useNavigate();
 
   return (
     <div className={styles["hackathon-container"]}>
@@ -43,12 +46,12 @@ const Hackathon = () => {
             </ul>
           </div>
           <a
-            href={hackathon.registrationLink}
+            onClick={() => navigate("/dashboard")}
             className={styles["hackathon-register"]}
             target="_blank"
             rel="noopener noreferrer"
           >
-            Register Here
+            Find Your Team!
           </a>
           <Map />
         </div>

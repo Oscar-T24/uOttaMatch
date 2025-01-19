@@ -14,10 +14,15 @@ const authStore = create((set) => ({
   loading: false,
   error: null,
   showRegister: true,
+  userProfileCompleted: false,
 
   actions: {
     setUser: (user) => {
       set(() => ({ user, loading: false }));
+    },
+
+    setUserProfileCompleted: (userProfileState) => {
+      set((state) => ({ ...state, userProfileCompleted: userProfileState }));
     },
 
     setLoading: (loading) => {

@@ -23,7 +23,11 @@ const Routes = () => {
         },
         {
           path: "/hackathons/:id",
-          element: <Hackathon />,
+          element: (
+            <Profile>
+              <Hackathon />
+            </Profile>
+          ),
         },
         {
           path: "/profile",
