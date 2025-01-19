@@ -40,6 +40,8 @@ class UserProfile:
                 # create a new entry
                 result = self.db.post('/users', user_data)
                 if result['success']:
+                    self.user_id = result['name']
+                    print(f'{self.user_id} saved to firebase ( USER ID)')
                     return True
 
 
@@ -64,6 +66,31 @@ class UserProfile:
     @staticmethod
     def get_attrs(dataclass_type: Any):
         return [field.name for field in fields(dataclass_type)]
+
+    @staticmethod
+    def remove_user(user_id):
+        path_to_delete = f'/users/{user_id}'  # Example: Deleting a user by their ID
+
+        # Delete the data at the specified path
+        load_dotenv()
+        db = firebase.FirebaseApplication(os.getenv("FIREBASE_URL"), None)
+        result = db.delete(path_to_delete, None)
+        return result
+
+    @staticmethod
+    def get_by_id(user_id):
+        # Define the path for the user
+        path = f'/users/{user_id}'
+
+        load_dotenv()
+        db = firebase.FirebaseApplication(os.getenv("FIREBASE_URL"), None)
+        user_data = db.get(path, None)
+
+        if user_data:
+            return user_data
+        else:
+            return None  # Return None if user not found
+
 #the @datclass decorator makes a custom __init__ method that allows to define every argument
 
 @dataclass
