@@ -139,12 +139,15 @@ class Matcher:
     def match(self):
         """matches people with cosine similarity"""
 
+        Matcher(self.k, list(UserProfile.get_all_users()["users"])[-1]).add_vector() # add current vector
+        
         for user in UserProfile.get_all_users()["users"]:
+            ### add vectors of the dtabase into pinecone DB
             try:
-                existing_vector = self.index.fetch([self.user_id])
+                existing_vector = self.index.fetch([user])
 
-                if self.user_id in existing_vector:
-                    print(f"User {self.user_id} already exists in the database.")
+                if existing_vector:
+                    print(f"User {self.user_id} already exists in the database.Skipping")
                     # User is already in the database, no need to add again
                 else:
                     print("Adding user : ", user)
@@ -222,11 +225,43 @@ class Matcher:
 
         return sorted(proximity_scores,key=lambda k: k[1], reverse=False)[:self.k]
 
+    def combined_scoring(self):
+        weights = {
+            "metadata": 0.6,  # Weight for metadata_embedder()
+            "vector_match": 0.4,  # Weight for match()
+        }
+        
+        metadata_scores = self.metadata_embedder()
+        metadata_dict = {user: score for user, score in metadata_scores}
+        
+        vector_scores = self.match()
+        vector_dict = {user: score for score, user in vector_scores}
 
+        max_metadata_score = max(metadata_dict.values(), default=1)
+        min_metadata_score = min(metadata_dict.values(), default=0)
+        normalized_metadata = {
+            user: (score - min_metadata_score) / (max_metadata_score - min_metadata_score + 1e-8)
+            for user, score in metadata_dict.items()
+        }
+        
+        normalized_vectors = {
+            user: (score + 1) / 2  # Normalize to range [0, 1]
+            for user, score in vector_dict.items()
+        }
+        
+        combined_scores = {}
+        for user in set(metadata_dict.keys()).union(vector_dict.keys()):
+            metadata_score = normalized_metadata.get(user, 0)
+            vector_score = normalized_vectors.get(user, 0)
+            combined_score = (
+                weights["metadata"] * metadata_score +
+                weights["vector_match"] * vector_score
+            )
+            combined_scores[user] = combined_score
 
-
-
+        return sorted(combined_scores.items(), key=lambda x: x[1], reverse=True)[:self.k]
+    
 if __name__ == "__main__":
-    to_propose = "-OGvh-9y-Rksw6LWMPQZ" #UserProfile.get_all_users()["users"]
-    print(Matcher(2, to_propose).match())
+    to_propose = "-OGz06DbPkLPgOhNBF2K" #UserProfile.get_all_users()["users"]
+    print(Matcher(3, to_propose).combined_scoring())
     #match = Matcher(3,username="oscar", age=4, major="", minor="", skillsets="", languages=["python","java"], university="",bio="")
