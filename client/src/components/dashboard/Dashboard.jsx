@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
+import Loader from "../loader/Loader";
+import styles from "../../modules/dashboard/Dashboard.module.css";
 
 const Dashboard = () => {
   const [users, setUsers] = useState([]);
 
   useEffect(() => {
-    fetch("http://127.0.0.1:5000/test");
-
     const fetchData = async () => {
-      const userId = window.prompt("Give user id");
+      const userId = window.prompt("User ID: ");
 
       if (userId) {
         try {
@@ -44,6 +44,8 @@ const Dashboard = () => {
             // Step 3: Wait for all user details to be fetched
             const usersData = await Promise.all(userPromises);
 
+            setUsers(usersData);
+
             console.log(usersData);
 
             // Step 4: Filter out any null values (in case of fetch failures)
@@ -63,20 +65,22 @@ const Dashboard = () => {
   }, []);
 
   return (
-    <div>
-      <h1>Dashboard</h1>
-      <div>
+    <div className={styles.parentGridWrapper}>
+      <h1 style={{ textAlign: "center" }}>Dashboard</h1>
+      <div className={styles.gridContainer}>
         {users.length > 0 ? (
           users.map((user, index) => (
-            <div key={index}>
-              <h2>User {index + 1}</h2>
-              <p>Age: {user.age}</p>
-              <p>Name: {user.username}</p>
-              <p>Proficiency In: {user.languages[0]}</p>
+            <div className={styles.personContainer} key={index}>
+              <h2> {user.username}</h2>
+              <h3>University: {user.university}</h3>
+              {user.languages.map((language) => (
+                <h3>{language}</h3>
+              ))}
+              <button>Contact</button>
             </div>
           ))
         ) : (
-          <p>Loading users...</p>
+          <Loader />
         )}
       </div>
     </div>

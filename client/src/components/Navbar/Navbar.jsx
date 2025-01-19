@@ -39,6 +39,7 @@ const Navbar = () => {
   };
 
   const onHackathonClick = () => {
+    setSearchQuery("");
     setFilteredHackathons([]);
   };
 
@@ -57,9 +58,6 @@ const Navbar = () => {
             value={searchQuery}
             onChange={handleSearchChange}
           />
-          <div className={styles.iconWrapper}>
-            <FaSearch />
-          </div>
         </div>
         <div className={styles.buttonWrapper}>
           <button onClick={() => handleOnClickLogout()}>Logout</button>

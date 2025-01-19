@@ -20,6 +20,59 @@
   animation: spin 1s linear infinite;
 }
 
+.cube {
+  width: 40px;
+  height: 40px;
+  position: absolute;
+  z-index: 100;
+  transform-style: preserve-3d;
+  animation: cubeRotation 2s linear infinite;
+}
+
+@keyframes cubeRotation {
+  from {
+    transform: rotateX(0deg) rotateY(0deg);
+  }
+  to {
+    transform: rotateX(360deg) rotateY(360deg);
+  }
+}
+
+.front:hover {
+  z-index: 180px;
+}
+
+.side {
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at center, #f8f7f7, #462525);
+  position: absolute;
+}
+
+.front {
+  transform: translateZ(20px);
+}
+
+.back {
+  transform: rotateX(180deg) translateZ(20px);
+}
+
+.left {
+  transform: rotateY(-90deg) translateZ(20px);
+}
+
+.right {
+  transform: rotateY(90deg) translateZ(20px);
+}
+
+.top {
+  transform: rotateX(90deg) translateZ(20px);
+}
+
+.bottom {
+  transform: rotateX(-90deg) translateZ(20px);
+}
+
 @keyframes spin {
   from {
     transform: rotate(0deg);
