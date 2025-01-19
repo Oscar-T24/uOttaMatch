@@ -92,12 +92,12 @@ def api(route):
 def get_user_attributes():
     return jsonify(UserProfile.get_attrs(UserProfile)), 200
 
-@app.route("/match1/<user_id>", methods=["GET"])
+@app.route("/match/<user_id>", methods=["GET"])
 def match_user(user_id):
     k = 4#request.args.get("k")
     return jsonify(Matcher(k, user_id).match()), 200
 
-@app.route("/match2/<user_id>", methods=["GET"])
+@app.route("/match1/<user_id>", methods=["GET"])
 def match_user(user_id):
     k = 4#request.args.get("k")
     return jsonify(Matcher(k, user_id).metadata_embedder()), 200
