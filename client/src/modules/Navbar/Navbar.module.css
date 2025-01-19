@@ -26,6 +26,10 @@
   gap: 32px;
 }
 
+.logoWrapper a {
+  text-decoration: none;
+}
+
 .logoWrapper span {
   font-size: 34px;
   font-weight: 700;

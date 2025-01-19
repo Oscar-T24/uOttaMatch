@@ -46,7 +46,9 @@ const Navbar = () => {
     <div className={styles.navWrapper}>
       <nav className={styles.nav}>
         <div className={styles.logoWrapper}>
-          <span>HackMate</span>
+          <Link to="/">
+            <span>HackMate</span>
+          </Link>
         </div>
         <div className={styles.inputWrapper}>
           <input
