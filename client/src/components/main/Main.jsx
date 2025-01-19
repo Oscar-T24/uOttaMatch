@@ -1,8 +1,6 @@
 import React from "react";
 import styles from "../../modules/main/Main.module.css";
 import { FaArrowDown } from "react-icons/fa";
-import Chatbot from "../../components/chatbot/Chatbot";
-import { Link } from "react-router-dom";
 
 const Main = () => {
   return (
@@ -18,20 +16,9 @@ const Main = () => {
           <div className={`${styles.bottom} ${styles.side}`}></div>
         </div>
       </div>
-      
-    <div className={styles.dashboardlink}>
-      <h2><Link to = "./Dashboard"> Find your Best Teammates Here! </Link> </h2>
-    </div>
-    <div>
-            {/* Other components */}
-            <Chatbot />
-          </div>
-      
-
-
-      <div className={styles.arrowDown}>
+      {/* <div className={styles.arrowDown}>
         <FaArrowDown fontSize={30} />
-      </div>
+      </div> */}
     </div>
   );
 };
