@@ -53,9 +53,10 @@ def add_user():
 
 
 # Route for removing a user - not implemented yet
-@app.route('/remove_user', methods=['POST'])
-def remove_user():
-    return jsonify({"message": "Method not implemented yet"}), 501
+@app.route('/remove_user/<user_id>', methods=['GET'])
+def remove_user(user_id):
+    result = UserProfile.remove_user(user_id)
+    return {"result of deletion": result}
 
 
 # Route for getting all users
@@ -66,6 +67,11 @@ def get_all():
     users = UserProfile.get_all_users()
     return jsonify(users), 200
 
+@app.route('/get_user/<user_id>', methods=['GET'])
+def get_user(user_id):
+    # Assuming `get_all_users()` is properly implemented in UserProfile
+    users = UserProfile.get_by_id(user_id)
+    return jsonify(users), 200
 
 # Route for serving static files like images, JS, CSS, etc., from the React build folder
 @app.route('/api/<path:route>', methods=['GET'])
