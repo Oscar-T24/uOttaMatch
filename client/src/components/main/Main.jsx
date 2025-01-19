@@ -1,6 +1,7 @@
 import React from "react";
 import styles from "../../modules/main/Main.module.css";
 import { FaArrowDown } from "react-icons/fa";
+import Chatbot from "../../components/chatbot/Chatbot";
 
 const Main = () => {
   return (
@@ -16,6 +17,13 @@ const Main = () => {
           <div className={`${styles.bottom} ${styles.side}`}></div>
         </div>
       </div>
+      
+    <div>
+            {/* Other components */}
+            <Chatbot />
+          </div>
+      
+
 
       <div className={styles.arrowDown}>
         <FaArrowDown fontSize={30} />
