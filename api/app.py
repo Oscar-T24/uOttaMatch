@@ -4,6 +4,7 @@ from profile import UserProfile  # Assuming your dataclass and related methods a
 from dataclasses import fields
 import os
 from flask_cors import CORS, cross_origin
+from cluster import Matcher
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}})
@@ -90,6 +91,7 @@ def api(route):
 @app.route("/user_attributes", methods=["GET"])
 def get_user_attributes():
     return jsonify(UserProfile.get_attrs(UserProfile)), 200
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
