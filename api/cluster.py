@@ -107,9 +107,9 @@ class Matcher:
             return None, binary_vector
 
 
-    def match(self):
+    #def match(self):
         #TODO
-        pass
+    #    pass
 
     def add_vector(self):
         # Ensure you vectorize the current user's languages and store them in Pinecone
@@ -160,6 +160,8 @@ class Matcher:
 
         current_user_vector = self.index.fetch([self.user_id])['vectors'][self.user_id]['values']
 
+        other_user_vector = None
+
         for user in self.users_data:
 
             try:
@@ -168,9 +170,10 @@ class Matcher:
             except:
                 print("Error fetching other user's vector, printing original values",self.index.fetch([user]))
 
-
-
-            score = cosine_similarity([current_user_vector], [other_user_vector])[0][0]
+            score = []
+            
+            if other_user_vector != None:
+                score = cosine_similarity([current_user_vector], [other_user_vector])[0][0]
 
             proximity_scores.append((score, user))
 

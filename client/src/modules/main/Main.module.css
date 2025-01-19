@@ -4,7 +4,7 @@
   align-items: center;
   flex-direction: column;
   background-color: #f0f4f8;
-  min-height: 100vh;
+  min-height: 80vh;
   margin: 0;
   padding: 20px;
   box-sizing: border-box;
@@ -16,7 +16,8 @@
   max-width: 90%;
   height: 600px;
   border-radius: 2rem;
-  box-shadow: 0 20px 40px rgba(27, 26, 26, 0.3), 0 10px 20px rgba(215, 209, 209, 0.2);
+  box-shadow: 0 20px 40px rgba(27, 26, 26, 0.3),
+    0 10px 20px rgba(215, 209, 209, 0.2);
   background: linear-gradient(135deg, #d9dde1, #e2e5ea);
   display: flex;
   justify-content: center;
@@ -26,7 +27,7 @@
   animation: bounceAnimation 1.8s ease-out;
 }
 
-.dashboardlink h2{
+.dashboardlink h2 {
   font-size: 20px;
   color: #290606;
   padding: 30px;
@@ -147,5 +148,23 @@
   }
   100% {
     transform: translateY(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .screen h1 {
+    font-size: 50px;
+    animation: enlargeTextAnimation 1.5s ease-in-out;
+  }
+
+  @keyframes enlargeTextAnimation {
+    from {
+      font-size: 20px;
+      opacity: 0;
+    }
+    to {
+      font-size: 50px;
+      opacity: 1;
+    }
   }
 }

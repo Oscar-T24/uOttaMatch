@@ -1,36 +1,72 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import styles from "../../modules/profile/Profile.module.css";
+import authStore from "../../store/authStore";
 
-const Profile = () => {
+const Profile = ({ children }) => {
   const { register, handleSubmit, reset } = useForm();
   const [skills, setSkills] = useState([]);
+  const [languages, setLanguages] = useState([]);
   const [skillInput, setSkillInput] = useState("");
+  const [languageInput, setLanguageInput] = useState("");
 
-  const addSkill = () => {
-    if (skillInput.trim() && !skills.includes(skillInput.trim())) {
-      setSkills([...skills, skillInput.trim()]);
-      setSkillInput("");
+  const authState = authStore((state) => state);
+  const { userProfileCompleted } = authState;
+  const { setUserProfileCompleted } = authState.actions;
+
+  const addItemToList = (input, setInput, list, setList) => {
+    const normalizedInput = input.trim().toLowerCase();
+    if (normalizedInput && !list.includes(normalizedInput)) {
+      setList([...list, normalizedInput]);
+      setInput("");
     }
   };
 
-  const removeSkill = (index) => {
-    setSkills(skills.filter((_, i) => i !== index));
+  const removeItemFromList = (index, list, setList) => {
+    setList(list.filter((_, i) => i !== index));
   };
 
   const onSubmit = (data) => {
-    console.log({ ...data, skills });
+    window.scrollTo({
+      top: 0,
+    });
+    setUserProfileCompleted(true);
+
+    const setData = {
+      ...data,
+      skills,
+      languages,
+    };
+
+    console.log("Profile data being sent to backend:", setData);
+
+    fetch("http://localhost:5000/add_user", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(setData),
+    })
+      .then((response) => response.json())
+      .then((result) => {
+        console.log("Success:", result);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+
     reset();
     setSkills([]);
+    setLanguages([]);
   };
+
+  if (userProfileCompleted) return children;
 
   return (
     <div className={styles.container}>
-      <header className={styles.header}>
-    
-      </header>
+      <header className={styles.header}></header>
       <div className={styles.formContainer}>
-        <h1 className={styles.heading}>Sign In</h1>
+        <h1 className={styles.heading}>Create Your Profile</h1>
         <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
           <div className={styles.formGroup}>
             <label>Username:</label>
@@ -51,7 +87,56 @@ const Profile = () => {
           </div>
 
           <div className={styles.formGroup}>
-            <label>Skill Sets:</label>
+            <label>Bio:</label>
+            <textarea
+              placeholder="Tell us something about yourself"
+              {...register("bio")}
+            />
+          </div>
+
+          <div className={styles.formGroup}>
+            <label>Programming Languages:</label>
+            <div className={styles.languageInputContainer}>
+              <input
+                type="text"
+                value={languageInput}
+                onChange={(e) => setLanguageInput(e.target.value)}
+                placeholder="Enter a programming language and press 'Add'"
+              />
+              <button
+                type="button"
+                onClick={() =>
+                  addItemToList(
+                    languageInput,
+                    setLanguageInput,
+                    languages,
+                    setLanguages
+                  )
+                }
+                className={styles.addSkillBtn}
+              >
+                Add
+              </button>
+            </div>
+            <div className={styles.skillTags}>
+              {languages.map((language, index) => (
+                <div key={index} className={styles.tag}>
+                  {language}
+                  <span
+                    className={styles.removeTag}
+                    onClick={() =>
+                      removeItemFromList(index, languages, setLanguages)
+                    }
+                  >
+                    &times;
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className={styles.formGroup}>
+            <label>Skills:</label>
             <div className={styles.skillInputContainer}>
               <input
                 type="text"
@@ -61,7 +146,9 @@ const Profile = () => {
               />
               <button
                 type="button"
-                onClick={addSkill}
+                onClick={() =>
+                  addItemToList(skillInput, setSkillInput, skills, setSkills)
+                }
                 className={styles.addSkillBtn}
               >
                 Add
@@ -73,7 +160,7 @@ const Profile = () => {
                   {skill}
                   <span
                     className={styles.removeTag}
-                    onClick={() => removeSkill(index)}
+                    onClick={() => removeItemFromList(index, skills, setSkills)}
                   >
                     &times;
                   </span>
@@ -104,7 +191,7 @@ const Profile = () => {
           </div>
 
           <div className={styles.formGroup}>
-            <label>Major (select one or more):</label>
+            <label>Major (select):</label>
             <select multiple {...register("major", { required: true })}>
               <option value="computer-science">Computer Science</option>
               <option value="engineering">Engineering</option>
@@ -117,7 +204,7 @@ const Profile = () => {
           </div>
 
           <div className={styles.formGroup}>
-            <label>Minor (select one or more):</label>
+            <label>Minor (select):</label>
             <select multiple {...register("minor", { required: true })}>
               <option value="computer-science">Computer Science</option>
               <option value="engineering">Engineering</option>
@@ -130,7 +217,7 @@ const Profile = () => {
           </div>
 
           <button type="submit" className={styles.submitBtn}>
-            Sign In
+            Save Profile
           </button>
         </form>
       </div>

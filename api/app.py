@@ -7,7 +7,7 @@ from flask_cors import CORS, cross_origin
 from cluster import Matcher
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}})
+CORS(app) # , resources={r"/*": {"origins": "http://localhost:5173"}})
 
 # ADD CORS so that you don;t have to proxy
 
@@ -98,9 +98,13 @@ def match_user(user_id):
     return jsonify(Matcher(k, user_id).match()), 200
 
 @app.route("/match1/<user_id>", methods=["GET"])
-def match_user(user_id):
+def match_user1(user_id):
     k = 4#request.args.get("k")
     return jsonify(Matcher(k, user_id).metadata_embedder()), 200
+
+@app.route("/test", methods=["GET"])
+def test():
+    return "Woah!", 200
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
