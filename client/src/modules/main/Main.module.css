@@ -26,6 +26,13 @@
   animation: bounceAnimation 1.8s ease-out;
 }
 
+.dashboardlink h2{
+  font-size: 20px;
+  color: #290606;
+  padding: 30px;
+  text-align: center;
+}
+
 .screen h1 {
   font-size: 70px;
   color: #290606;
