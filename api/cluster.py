@@ -89,15 +89,23 @@ class Matcher:
 
         user_data = self.db.get(f'/users/{self.user_id}', None) #get attributes of the user
 
-        user_languages = set(user_data["languages"]) #remove duplicates
-        binary_vector = [1.0 if language in user_languages else 0.0 for language in unique_languages]
-        remaining_dims = self._tofill()
-        for _ in range(remaining_dims):
-            binary_vector.extend([0.0])
-        # fill up the remaining dimensions
-        binary_matrix = np.array(binary_vector)
+        try:
+            user_languages = set(user_data["languages"]) #remove duplicates
+            binary_vector = [1.0 if language in user_languages else 0.0 for language in unique_languages]
+            remaining_dims = self._tofill()
+            for _ in range(remaining_dims):
+                binary_vector.extend([0.0])
+            # fill up the remaining dimensions
+            binary_matrix = np.array(binary_vector)
 
-        return unique_languages, binary_matrix
+            return unique_languages, binary_matrix
+        except KeyError:
+            print("Error retrieving user data language ! Skipping current entry")
+            binary_vector = []
+            for _ in range(self.dimension):
+                binary_vector.extend([0.0])
+            return None, binary_vector
+
 
     def match(self):
         #TODO

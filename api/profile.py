@@ -91,8 +91,6 @@ class UserProfile:
         else:
             return None  # Return None if user not found
 
-    #def get_id(args**):
-        #pass
 
 #the @datclass decorator makes a custom __init__ method that allows to define every argument
 
