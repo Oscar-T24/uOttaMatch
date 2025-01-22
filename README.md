@@ -11,3 +11,12 @@
 #### cd into `api`
 
 > In a terminal, run `python app.py`
+
+### Features
+
+* Google Firebase oAuth2 Authentification 
+* Google Firebase Realtime database storage
+* Pinecone vector database storage
+* Embedded vectors analysis with binary vectorization
+* React app
+  
