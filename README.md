@@ -19,4 +19,7 @@
 * Pinecone vector database storage
 * Embedded vectors analysis with binary vectorization
 * React app
-  
+
+### Depedencies 
+
+* 
