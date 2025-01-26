@@ -21,6 +21,8 @@ class UserProfile:
     def __post_init__(self):
         # connect to mongoDB
         load_dotenv()
+        if os.getenv("FIREBASE_URL") is None:
+            raise AssertionError("Did you forget to create a dotenv file with the secret API keys ?")
         self.db = firebase.FirebaseApplication(os.getenv("FIREBASE_URL"), None)
         self.user_id = None
     # post init executes after init

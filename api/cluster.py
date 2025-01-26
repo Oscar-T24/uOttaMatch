@@ -22,6 +22,8 @@ class Matcher:
         load_dotenv()
         self.k = k
         self.dimension=dimension
+        if os.getenv("FIREBASE_URL") is None:
+            raise AssertionError("Did you forget to create a dotenv file with the secret API keys ?")
         self.db = firebase.FirebaseApplication(os.getenv("FIREBASE_URL"), None)
         self.users_data = self.db.get('/users', None)
         self.user_id = user_id
@@ -30,6 +32,8 @@ class Matcher:
         # Calculate the total dimension based on feature vectors
 
         pc = Pinecone(api_key=os.getenv("PINECONE_API_KEY"))
+        if pc is None:
+            raise AssertionError("Did you forget to create a dotenv file with the secret API keys ?")
 
         # Check if index exists and has correct dimension
         existing_indexes = pc.list_indexes()
